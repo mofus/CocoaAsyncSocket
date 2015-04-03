@@ -27,7 +27,7 @@
 #import <net/if.h>
 #import <sys/socket.h>
 #import <sys/types.h>
-
+#import <mach/mach_time.h> // for mach_absolute_time
 
 #if 0
 
@@ -963,11 +963,11 @@ enum GCDAsyncUdpSocketConfig
 	}
 }
 
-- (void)notifyDidReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(id)context
+- (void)notifyDidReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(id)context andTimeReceived:(uint64_t) timeReceived
 {
 	LogTrace();
 	
-	SEL selector = @selector(udpSocket:didReceiveData:fromAddress:withFilterContext:);
+    SEL selector = @selector(udpSocket:didReceiveData:fromAddress:withFilterContext:andTimeReceived:);
 	
 	if (delegateQueue && [delegate respondsToSelector:selector])
 	{
@@ -975,7 +975,7 @@ enum GCDAsyncUdpSocketConfig
 		
 		dispatch_async(delegateQueue, ^{ @autoreleasepool {
 			
-			[theDelegate udpSocket:self didReceiveData:data fromAddress:address withFilterContext:context];
+			[theDelegate udpSocket:self didReceiveData:data fromAddress:address withFilterContext:context andTimeReceived:timeReceived];
 		}});
 	}
 }
@@ -4198,6 +4198,7 @@ enum GCDAsyncUdpSocketConfig
 
 - (void)doReceive
 {
+    uint64_t timeReceived = mach_absolute_time();
 	LogTrace();
 	
 	if ((flags & (kReceiveOnce | kReceiveContinuous)) == 0)
@@ -4409,7 +4410,7 @@ enum GCDAsyncUdpSocketConfig
 							
 							if (allowed)
 							{
-								[self notifyDidReceiveData:data fromAddress:addr withFilterContext:filterContext];
+                                [self notifyDidReceiveData:data fromAddress:addr withFilterContext:filterContext andTimeReceived:timeReceived];
 							}
 							else
 							{
@@ -4444,7 +4445,7 @@ enum GCDAsyncUdpSocketConfig
 					
 					if (allowed)
 					{
-						[self notifyDidReceiveData:data fromAddress:addr withFilterContext:filterContext];
+						[self notifyDidReceiveData:data fromAddress:addr withFilterContext:filterContext andTimeReceived:timeReceived];
 						notifiedDelegate = YES;
 					}
 					else
@@ -4456,7 +4457,7 @@ enum GCDAsyncUdpSocketConfig
 			}
 			else // if (!receiveFilterBlock || !receiveFilterQueue)
 			{
-				[self notifyDidReceiveData:data fromAddress:addr withFilterContext:nil];
+				[self notifyDidReceiveData:data fromAddress:addr withFilterContext:nil andTimeReceived:timeReceived];
 				notifiedDelegate = YES;
 			}
 		}

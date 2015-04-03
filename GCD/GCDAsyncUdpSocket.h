@@ -985,7 +985,8 @@ typedef BOOL (^GCDAsyncUdpSocketSendFilterBlock)(NSData *data, NSData *address, 
 **/
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
                                              fromAddress:(NSData *)address
-                                       withFilterContext:(id)filterContext;
+                                       withFilterContext:(id)filterContext
+                                   andTimeReceived:(uint64_t) timeReceived;
 
 /**
  * Called when the socket is closed.
