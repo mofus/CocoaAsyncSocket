@@ -1,5 +1,9 @@
 CocoaAsyncSocket provides easy-to-use and powerful asynchronous socket libraries for Mac and iOS. The classes are described below.
 
+## Fork Info
+This fork timestamps messages as soon as they are received and forwards this information to the delegate.
+Currently only working on this for GCDAsyncUdpSocket.
+
 ## TCP
 
 **GCDAsyncSocket** and **AsyncSocket** are TCP/IP socket networking libraries. Here are the key features available in both:
